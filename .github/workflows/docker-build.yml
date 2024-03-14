@@ -17,10 +17,10 @@ jobs:
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Build Docker Image
-        run: docker build -t "${{ secrets.DOCKERHUB_USERNAME }}"/ng2:latest .
+        run: docker build -t "${{ secrets.DOCKERHUB_USERNAME }}"/node-app-http-docker:latest .
 
       - name: Push Docker Image to Docker Hub
-        run: docker push "${{ secrets.DOCKERHUB_USERNAME }}"/ng2:latest
+        run: docker push "${{ secrets.DOCKERHUB_USERNAME }}"/node-app-http-docker:latest
 
       - name: Set up Kubectl
         uses: azure/setup-kubectl@v1
@@ -34,5 +34,6 @@ jobs:
         run: |
           echo "$KUBECONFIG_FILE" > kubeconfig.yaml
           kubectl config use-context kubernetes-admin@kubernetes --kubeconfig=kubeconfig.yaml
-          kubectl run testpod --image=nginx:alpine --kubeconfig=kubeconfig.yaml
+          kubectl run testpod --image="${{ secrets.DOCKERHUB_USERNAME }}"/node-app-http-docker:latest --kubeconfig=kubeconfig.yaml
+
           #kubectl apply --kubeconfig=./kubeconfig.yaml --namespace=$KUBE_NAMESPACE -f nginx_deploy.yml
