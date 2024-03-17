@@ -3,7 +3,7 @@ name: Docker Build and Push
 on:
   push:
     branches:
-      - main  # Adjust this based on your branch name
+      - main
 
 jobs:
   build:
@@ -30,16 +30,8 @@ jobs:
 
       - name: Authenticate and deploy to Kubernetes
         working-directory: k8s
-        #env:
-        #  KUBECONFIG_FILE: ${{ secrets.KUBECONFIG }}
-        #  KUBE_NAMESPACE: default
         run: |
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
           kubectl config use-context kubernetes-admin@kubernetes \
             --kubeconfig=kubeconfig.yaml
-          kubectl run testpod \
-            --image "${{ secrets.DOCKERHUB_USERNAME }}"/node-app-http-docker:latest \
-            --namespace default \
-            --kubeconfig=kubeconfig.yaml
-
-          #kubectl apply --kubeconfig=./kubeconfig.yaml --namespace=$KUBE_NAMESPACE -f nginx_deploy.yml
+          kubectl apply --kubeconfig=kubeconfig.yaml --namespace=default -f node-app-http-docker-k8s-deployment.yaml
