@@ -34,7 +34,7 @@ jobs:
         #  KUBECONFIG_FILE: ${{ secrets.KUBECONFIG }}
         #  KUBE_NAMESPACE: default
         run: |
-          echo "${{ secrets.KUBECONFIG_FILE }}" > kubeconfig.yaml
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
           kubectl config use-context kubernetes-admin@kubernetes \
             --kubeconfig=kubeconfig.yaml
           kubectl run testpod \
