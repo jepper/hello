@@ -17,6 +17,7 @@ spec:
       labels:
         app: node-app-http-docker
     spec:
+      nodeName: ubuntu-c38557
       containers:
       - image: kwe9kq6yc3md3qvk/node-app-http-docker:latest
         name: node-app-http-docker
@@ -24,11 +25,17 @@ spec:
         volumeMounts:
         - mountPath: "/my-data"
           name: norlys-pv-storage
-        name: node-app-http-docker
+      - image: busybox
+        name: busybox
+        args:
+        - sleep
+        - "86400"
         resources: {}
         volumeMounts:
         - mountPath: "/my-data"
           name: norlys-pv-storage
+        command: ["/bin/sh","-c"]
+        args: ["while true; do date >> /my-data/date.txt; sleep 10; done"]
       volumes:
         - name: norlys-pv-storage
           persistentVolumeClaim:
@@ -39,7 +46,7 @@ status: {}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: task-pv-claim
+  name: norlys-pv-claim
 spec:
   storageClassName: manual
   accessModes:
@@ -52,7 +59,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: task-pv-volume
+  name: norlys-pv-volume
   labels:
     type: local
 spec:
@@ -62,5 +69,13 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/mnt/data"
+    path: "/mnt/norlys/my-data"
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - ubuntu-c38557
 
