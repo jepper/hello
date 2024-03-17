@@ -24,6 +24,11 @@ spec:
         volumeMounts:
         - mountPath: "/my-data"
           name: norlys-pv-storage
+        name: node-app-http-docker
+        resources: {}
+        volumeMounts:
+        - mountPath: "/my-data"
+          name: norlys-pv-storage
       volumes:
         - name: norlys-pv-storage
           persistentVolumeClaim:
