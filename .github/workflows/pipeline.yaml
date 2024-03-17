@@ -18,6 +18,7 @@ jobs:
 
       - name: Build Docker Image
         run: docker build -t "${{ secrets.DOCKERHUB_USERNAME }}"/node-app-http-docker:latest .
+        working-directory: node-app-http-docker
 
       - name: Push Docker Image to Docker Hub
         run: docker push "${{ secrets.DOCKERHUB_USERNAME }}"/node-app-http-docker:latest
@@ -28,12 +29,17 @@ jobs:
           version: 'latest'
 
       - name: Authenticate and deploy to Kubernetes
-        env:
-          KUBECONFIG_FILE: ${{ secrets.KUBECONFIG }}
-          KUBE_NAMESPACE: default
+        working-directory: k8s
+        #env:
+        #  KUBECONFIG_FILE: ${{ secrets.KUBECONFIG }}
+        #  KUBE_NAMESPACE: default
         run: |
-          echo "$KUBECONFIG_FILE" > kubeconfig.yaml
-          kubectl config use-context kubernetes-admin@kubernetes --kubeconfig=kubeconfig.yaml
-          kubectl run testpod --image="${{ secrets.DOCKERHUB_USERNAME }}"/node-app-http-docker:latest --kubeconfig=kubeconfig.yaml
+          echo "${{ secrets.KUBECONFIG_FILE }}" > kubeconfig.yaml
+          kubectl config use-context kubernetes-admin@kubernetes \
+            --kubeconfig=kubeconfig.yaml
+          kubectl run testpod \
+            --image "${{ secrets.DOCKERHUB_USERNAME }}"/node-app-http-docker:latest \
+            --namespace default \
+            --kubeconfig=kubeconfig.yaml
 
           #kubectl apply --kubeconfig=./kubeconfig.yaml --namespace=$KUBE_NAMESPACE -f nginx_deploy.yml

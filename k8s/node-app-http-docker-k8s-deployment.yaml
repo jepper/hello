@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: node-app-http-docker
+  name: node-app-http-docker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-app-http-docker
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: node-app-http-docker
+    spec:
+      containers:
+      - image: kwe9kq6yc3md3qvk/node-app-http-docker:latest
+        name: node-app-http-docker
+        resources: {}
+        volumeMounts:
+        - mountPath: "/my-data"
+          name: norlys-pv-storage
+      volumes:
+        - name: norlys-pv-storage
+          persistentVolumeClaim:
+            claimName: norlys-pv-claim
+status: {}
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: task-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: task-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+
