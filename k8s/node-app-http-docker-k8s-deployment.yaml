@@ -27,9 +27,6 @@ spec:
           name: norlys-pv-storage
       - image: busybox
         name: busybox
-        args:
-        - sleep
-        - "86400"
         resources: {}
         volumeMounts:
         - mountPath: "/my-data"
