@@ -32,6 +32,8 @@ jobs:
         working-directory: k8s
         run: |
           echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+          set -x
           kubectl config use-context kubernetes-admin@kubernetes \
             --kubeconfig=kubeconfig.yaml
           kubectl apply --kubeconfig=kubeconfig.yaml --namespace=default -f node-app-http-docker-k8s-deployment.yaml
+          rm -f kubeconfig.yaml
